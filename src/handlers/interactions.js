@@ -51,7 +51,7 @@ async function handleButton(interaction) {
 
     case 'market_my_listings': {
       const items = store.getUserListings(interaction.user.id).map(
-        (l) => `**${l.title}** — ${getCategoryLabel(l.category)}\n${l.link}`
+        (l) => `**${l.title}** — ${l.price} — ${getCategoryLabel(l.category)}${l.link ? `\n${l.link}` : ''}`
       );
       return interaction.reply({
         embeds: [listEmbed('🛒 Mes annonces', items, "Tu n'as encore publié aucune annonce.")],
@@ -97,6 +97,7 @@ async function handleModalSubmit(interaction) {
       username: interaction.user.tag,
       category,
       title: interaction.fields.getTextInputValue('title'),
+      price: interaction.fields.getTextInputValue('price'),
       link: interaction.fields.getTextInputValue('link'),
       createdAt: Date.now(),
     };
