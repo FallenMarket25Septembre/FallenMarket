@@ -85,6 +85,26 @@ function listEmbed(title, items, emptyText) {
   return embed;
 }
 
+function allListingsEmbed(listings) {
+  const embed = new EmbedBuilder().setColor(BRAND_COLOR).setTitle('🖤 Toutes les annonces');
+  if (!listings.length) {
+    embed.setDescription("Aucune annonce en cours pour l'instant.");
+    return embed;
+  }
+  const sorted = [...listings].sort((a, b) => b.createdAt - a.createdAt);
+  const shown = sorted.slice(0, 25);
+  const lines = shown.map((l, i) => {
+    const parts = [`**${i + 1}. ${l.title}** — ${l.price}`, `${l.username}`];
+    if (l.link) parts.push(l.link);
+    return parts.join('\n');
+  });
+  embed.setDescription(lines.join('\n\n'));
+  if (sorted.length > shown.length) {
+    embed.setFooter({ text: `+ ${sorted.length - shown.length} autre(s) annonce(s) non affichée(s)` });
+  }
+  return embed;
+}
+
 module.exports = {
   panelEmbed,
   listingConfirmEmbed,
