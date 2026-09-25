@@ -17,12 +17,10 @@ function panelEmbed() {
         'Publie une annonce ou recherche une pièce du catalogue.',
         '',
         '**Quelques règles**',
-        '• Aucun paiement ni échange privé sur Discord.',
+        '• Aucun paiement ni échange privé sur le Discord.',
         '• Signale toute annonce suspecte au staff.',
         '',
         'Fallen Market Place et son équipe ne sont pas responsables des transactions.',
-        '',
-        'Gère tes alertes dans #notifications.',
       ].join('\n')
     )
     .setFooter({ text: footer });
