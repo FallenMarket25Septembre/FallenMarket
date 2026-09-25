@@ -111,4 +111,5 @@ module.exports = {
   searchConfirmEmbed,
   matchDmEmbed,
   listEmbed,
+  allListingsEmbed,
 };
