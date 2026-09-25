@@ -9,7 +9,7 @@ const {
 } = require('discord.js');
 const { CATEGORIES } = require('../config/categories');
 
-// ---- Panneau principal (les 4 boutons de ta capture) ----
+// ---- Panneau principal (les 4 boutons de ta capture + 2 nouveaux) ----
 function panelButtons() {
   const row1 = new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId('market_sell').setLabel('Vendre un article').setEmoji('🛒').setStyle(ButtonStyle.Success),
@@ -19,7 +19,11 @@ function panelButtons() {
     new ButtonBuilder().setCustomId('market_my_listings').setLabel('Mes annonces').setEmoji('🛒').setStyle(ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('market_my_searches').setLabel('Mes recherches').setEmoji('🔍').setStyle(ButtonStyle.Secondary)
   );
-  return [row1, row2];
+  const row3 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('market_all_listings').setLabel('Toutes les annonces').setEmoji('📋').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('market_delete').setLabel('Supprimer une annonce').setEmoji('🗑️').setStyle(ButtonStyle.Danger)
+  );
+  return [row1, row2, row3];
 }
 
 // ---- Menu déroulant "Type de produit" (image 3 de ta capture) ----
@@ -29,6 +33,24 @@ function categorySelectRow(customId, placeholder = 'Type de produit') {
     .setPlaceholder(placeholder)
     .addOptions(
       CATEGORIES.map((c) => ({ label: c.label, value: c.value, emoji: c.emoji }))
+    );
+  return new ActionRowBuilder().addComponents(menu);
+}
+
+// ---- Menu déroulant : choisir une annonce à supprimer ----
+// `listings` : les annonces parmi lesquelles choisir (déjà filtrées selon les
+// droits de qui a cliqué : soit ses propres annonces, soit toutes si admin).
+// Discord limite un select menu à 25 options.
+function listingSelectRow(listings) {
+  const menu = new StringSelectMenuBuilder()
+    .setCustomId('market_delete_select')
+    .setPlaceholder('Choisis une annonce à supprimer')
+    .addOptions(
+      listings.slice(0, 25).map((l) => ({
+        label: l.title.slice(0, 100),
+        description: `${l.price} — ${l.username}`.slice(0, 100),
+        value: l.id,
+      }))
     );
   return new ActionRowBuilder().addComponents(menu);
 }
@@ -79,4 +101,4 @@ function searchModal(category) {
   return modal;
 }
 
-module.exports = { panelButtons, categorySelectRow, sellModal, searchModal };
+module.exports = { panelButtons, categorySelectRow, listingSelectRow, sellModal, searchModal };
