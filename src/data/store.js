@@ -54,6 +54,22 @@ function getListingsForCategory(category) {
   return read().listings.filter((l) => l.category === category);
 }
 
+function getAllListings() {
+  return read().listings;
+}
+
+function getListingById(listingId) {
+  return read().listings.find((l) => l.id === listingId);
+}
+
+function removeListingById(listingId) {
+  const db = read();
+  const before = db.listings.length;
+  db.listings = db.listings.filter((l) => l.id !== listingId);
+  write(db);
+  return db.listings.length < before;
+}
+
 function removeSearch(searchId, userId) {
   const db = read();
   const before = db.searches.length;
@@ -77,6 +93,9 @@ module.exports = {
   getUserSearches,
   getActiveSearchesForCategory,
   getListingsForCategory,
+  getAllListings,
+  getListingById,
+  removeListingById,
   removeSearch,
   removeListing,
 };
