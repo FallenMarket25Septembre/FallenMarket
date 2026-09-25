@@ -40,18 +40,26 @@ function sellModal(category) {
     .setCustomId('title')
     .setLabel("Titre de l'article")
     .setStyle(TextInputStyle.Short)
-    .setPlaceholder('Ex: Aspirine pour bébé, 100mg')
+    .setPlaceholder('Ex: Hoodie noir, taille M')
     .setRequired(true)
     .setMaxLength(100);
+  const price = new TextInputBuilder()
+    .setCustomId('price')
+    .setLabel('Prix')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('Ex: 20€, ou "à négocier"')
+    .setRequired(true)
+    .setMaxLength(30);
   const link = new TextInputBuilder()
     .setCustomId('link')
-    .setLabel('Lien de ton annonce Vinted')
+    .setLabel('Lien (optionnel)')
     .setStyle(TextInputStyle.Short)
-    .setPlaceholder('https://www.vinted.fr/...')
-    .setRequired(true)
+    .setPlaceholder('https://... (laisse vide si pas de lien)')
+    .setRequired(false)
     .setMaxLength(300);
   modal.addComponents(
     new ActionRowBuilder().addComponents(title),
+    new ActionRowBuilder().addComponents(price),
     new ActionRowBuilder().addComponents(link)
   );
   return modal;
@@ -64,7 +72,7 @@ function searchModal(category) {
     .setCustomId('query')
     .setLabel('Que cherches-tu exactement ?')
     .setStyle(TextInputStyle.Paragraph)
-    .setPlaceholder('Ex: Aspirine pour bébé 100 ou 200mg')
+    .setPlaceholder('Ex: Hoodie noir, taille M ou L')
     .setRequired(true)
     .setMaxLength(300);
   modal.addComponents(new ActionRowBuilder().addComponents(query));
