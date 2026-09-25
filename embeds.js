@@ -3,10 +3,10 @@ const { EmbedBuilder } = require('discord.js');
 const BRAND_COLOR = 0x8b5cf6; // violet, assorti à l'emoji 👁️
 
 function panelEmbed() {
-  const footer = process.env.CREDIT_FOOTER || 'by @market-lucid.';
+  const footer = process.env.CREDIT_FOOTER || 'by @anzuko.';
   return new EmbedBuilder()
     .setColor(BRAND_COLOR)
-    .setTitle('👁️ __MARKET LUCID__')
+    .setTitle('**Fallent Market Place**')
     .setDescription(
       [
         'Vends et retrouve les articles Lucid.',
@@ -14,11 +14,10 @@ function panelEmbed() {
         'Publie une annonce Vinted ou recherche une pièce du catalogue.',
         '',
         '**Quelques règles**',
-        '• Annonces et achats via **Vinted** uniquement.',
-        '• Aucun paiement ni échange privé sur Discord.',
+        '• Aucun paiement ni échange privé sur le Discord.',
         '• Signale toute annonce suspecte au staff.',
         '',
-        'Lucid et son équipe ne sont pas responsables des transactions.',
+        'Léquipe du staff ne sont pas responsables des transactions.',
         '',
         'Gère tes alertes dans #notifications.',
       ].join('\n')
@@ -53,14 +52,14 @@ function searchConfirmEmbed(search, categoryLabel) {
 function matchDmEmbed(listing, categoryLabel) {
   return new EmbedBuilder()
     .setColor(BRAND_COLOR)
-    .setTitle('👁️ Quelqu\'un vend un article que tu cherches !')
+    .setTitle('Quelqu\'un vend un article que tu cherches !')
     .addFields(
       { name: 'Catégorie', value: categoryLabel, inline: true },
       { name: 'Article', value: listing.title, inline: true },
       { name: 'Lien Vinted', value: listing.link },
       { name: 'Vendeur', value: `${listing.username} (\`${listing.userId}\`)` }
     )
-    .setFooter({ text: 'Contacte-le uniquement via Vinted.' })
+    .setFooter({ text: 'Contacte-le via Vinted ou Discord.' })
     .setTimestamp();
 }
 
