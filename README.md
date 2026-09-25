@@ -1,15 +1,3 @@
-# Market Lucid — Bot Discord
-
-Bot de petites annonces (via Vinted) avec alertes DM automatiques.
-
-## ⚠️ Avant toute chose
-
-Le token que tu as collé dans le chat est grillé. Va sur le
-[portail développeur Discord](https://discord.com/developers/applications) →
-ton appli → **Bot** → **Reset Token**, et utilise le nouveau token ci-dessous.
-Ne colle **jamais** un token dans un fichier suivi par git (`.env` est déjà
-ignoré via `.gitignore`).
-
 ## Fonctionnalités
 
 - Panneau avec 4 boutons : **Vendre un article**, **Rechercher un article**,
