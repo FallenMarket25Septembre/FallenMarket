@@ -7,11 +7,10 @@
 // ============================================================
 
 const CATEGORIES = [
-  { value: 'hauts', label: 'Hauts', emoji: '👕' },
-  { value: 'bas', label: 'Bas', emoji: '👖' },
-  { value: 'vestes', label: 'Vestes & Manteaux', emoji: '🧥' },
-  { value: 'chaussures', label: 'Chaussures', emoji: '👟' },
-  { value: 'accessoires', label: 'Accessoires', emoji: '🎒' },
+  { value: 'hauts', label: 'Stimulants', emoji: '🧩' },
+  { value: 'bas', label: 'Auxillaires', emoji: '💊' },
+  { value: 'vestes', label: 'Peptides', emoji: '🧬' },
+  { value: 'chaussures', label: 'Stéroides', emoji: '💉' },
   { value: 'autre', label: 'Autre', emoji: '📦' },
 ];
 
