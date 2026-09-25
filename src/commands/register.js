@@ -4,7 +4,7 @@ const { REST, Routes, SlashCommandBuilder } = require('discord.js');
 const commands = [
   new SlashCommandBuilder()
     .setName('market-panel')
-    .setDescription('Publie le panneau Fallent MarketPlace dans ce salon (staff uniquement).')
+    .setDescription('Publie le panneau Fallen Market Place dans ce salon (staff uniquement).')
     .toJSON(),
 ];
 
