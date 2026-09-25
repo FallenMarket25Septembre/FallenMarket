@@ -1,8 +1,21 @@
 const { randomUUID } = require('crypto');
 const { getCategoryByValue, getCategoryLabel } = require('../config/categories');
 const store = require('../data/store');
-const { panelEmbed, listingConfirmEmbed, searchConfirmEmbed, matchDmEmbed, listEmbed } = require('../ui/embeds');
-const { panelButtons, categorySelectRow, sellModal, searchModal } = require('../ui/components');
+const {
+  panelEmbed,
+  listingConfirmEmbed,
+  searchConfirmEmbed,
+  matchDmEmbed,
+  listEmbed,
+  allListingsEmbed,
+} = require('../ui/embeds');
+const {
+  panelButtons,
+  categorySelectRow,
+  listingSelectRow,
+  sellModal,
+  searchModal,
+} = require('../ui/components');
 
 async function handleInteraction(interaction) {
   try {
@@ -68,20 +81,82 @@ async function handleButton(interaction) {
         ephemeral: true,
       });
     }
+
+    // ---- Leaderboard : toutes les annonces en cours, toutes catégories ----
+    case 'market_all_listings': {
+      return interaction.reply({
+        embeds: [allListingsEmbed(store.getAllListings())],
+        ephemeral: true,
+      });
+    }
+
+    // ---- Suppression : on montre un menu adapté aux droits de qui clique ----
+    case 'market_delete': {
+      const isAdmin = interaction.memberPermissions?.has('ManageGuild');
+      const listings = isAdmin ? store.getAllListings() : store.getUserListings(interaction.user.id);
+
+      if (!listings.length) {
+        return interaction.reply({
+          content: isAdmin
+            ? "Il n'y a aucune annonce à supprimer pour l'instant."
+            : "Tu n'as encore publié aucune annonce à supprimer.",
+          ephemeral: true,
+        });
+      }
+
+      return interaction.reply({
+        content: isAdmin
+          ? 'Choisis une annonce à supprimer (droits modérateur : toutes les annonces).'
+          : 'Choisis une de tes annonces à supprimer.',
+        components: [listingSelectRow(listings)],
+        ephemeral: true,
+      });
+    }
   }
 }
 
-// ---------------- Menus déroulants (choix de catégorie) ----------------
+// ---------------- Menus déroulants ----------------
 async function handleSelectMenu(interaction) {
-  const category = interaction.values[0];
-  const cat = getCategoryByValue(category);
-  if (!cat) return interaction.reply({ content: 'Catégorie invalide.', ephemeral: true });
+  if (interaction.customId === 'market_sell_category' || interaction.customId === 'market_search_category') {
+    const category = interaction.values[0];
+    const cat = getCategoryByValue(category);
+    if (!cat) return interaction.reply({ content: 'Catégorie invalide.', ephemeral: true });
 
-  if (interaction.customId === 'market_sell_category') {
-    return interaction.showModal(sellModal(category));
-  }
-  if (interaction.customId === 'market_search_category') {
+    if (interaction.customId === 'market_sell_category') {
+      return interaction.showModal(sellModal(category));
+    }
     return interaction.showModal(searchModal(category));
+  }
+
+  // ---- Sélection d'une annonce à supprimer ----
+  if (interaction.customId === 'market_delete_select') {
+    const listingId = interaction.values[0];
+    const listing = store.getListingById(listingId);
+
+    if (!listing) {
+      return interaction.update({ content: "Cette annonce n'existe plus.", embeds: [], components: [] });
+    }
+
+    const isOwner = listing.userId === interaction.user.id;
+    const isAdmin = interaction.memberPermissions?.has('ManageGuild');
+
+    // Sécurité : même si le menu ne montre en théorie que les bonnes annonces,
+    // on revérifie ici au cas où (annonce supprimée entre-temps, menu périmé, etc.)
+    if (!isOwner && !isAdmin) {
+      return interaction.update({
+        content: "🔒 Tu ne peux supprimer que tes propres annonces.",
+        embeds: [],
+        components: [],
+      });
+    }
+
+    store.removeListingById(listing.id);
+
+    return interaction.update({
+      content: `🗑️ Annonce supprimée : **${listing.title}** — ${listing.price}`,
+      embeds: [],
+      components: [],
+    });
   }
 }
 
