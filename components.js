@@ -40,7 +40,7 @@ function sellModal(category) {
     .setCustomId('title')
     .setLabel("Titre de l'article")
     .setStyle(TextInputStyle.Short)
-    .setPlaceholder('Ex: Hoodie Lucid noir, taille M')
+    .setPlaceholder('Ex: Aspirine pour bébé, 100mg')
     .setRequired(true)
     .setMaxLength(100);
   const link = new TextInputBuilder()
@@ -64,7 +64,7 @@ function searchModal(category) {
     .setCustomId('query')
     .setLabel('Que cherches-tu exactement ?')
     .setStyle(TextInputStyle.Paragraph)
-    .setPlaceholder('Ex: Hoodie Lucid noir, taille M ou L')
+    .setPlaceholder('Ex: Aspirine pour bébé 100 ou 200mg')
     .setRequired(true)
     .setMaxLength(300);
   modal.addComponents(new ActionRowBuilder().addComponents(query));
