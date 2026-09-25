@@ -1,23 +1,26 @@
 const { EmbedBuilder } = require('discord.js');
 
-const BRAND_COLOR = 0x8b5cf6; // violet, assorti à l'emoji 👁️
+// Gris "intégré" : la barre latérale de l'embed se fond dans le fond de
+// l'embed lui-même au lieu de trancher avec une couleur vive. Même teinte
+// utilisée partout pour un rendu cohérent et sobre.
+const BRAND_COLOR = 0x2b2d31;
 
 function panelEmbed() {
-  const footer = process.env.CREDIT_FOOTER || 'by @anzuko.';
+  const footer = process.env.CREDIT_FOOTER || 'by anzuko';
   return new EmbedBuilder()
     .setColor(BRAND_COLOR)
-    .setTitle('**Fallent Market Place**')
+    .setTitle('🖤 __FALLEN MARKET PLACE__')
     .setDescription(
       [
-        'Vends et retrouve les articles Lucid.',
+        'Vends et retrouve des articles.',
         '',
-        'Publie une annonce Vinted ou recherche une pièce du catalogue.',
+        'Publie une annonce ou recherche une pièce du catalogue.',
         '',
         '**Quelques règles**',
-        '• Aucun paiement ni échange privé sur le Discord.',
+        '• Aucun paiement ni échange privé sur Discord.',
         '• Signale toute annonce suspecte au staff.',
         '',
-        'Léquipe du staff ne sont pas responsables des transactions.',
+        'Fallen Market Place et son équipe ne sont pas responsables des transactions.',
         '',
         'Gère tes alertes dans #notifications.',
       ].join('\n')
@@ -26,20 +29,24 @@ function panelEmbed() {
 }
 
 function listingConfirmEmbed(listing, categoryLabel) {
-  return new EmbedBuilder()
-    .setColor(0x2ecc71)
+  const embed = new EmbedBuilder()
+    .setColor(BRAND_COLOR)
     .setTitle('✅ Annonce publiée')
     .addFields(
       { name: 'Catégorie', value: categoryLabel, inline: true },
       { name: 'Titre', value: listing.title, inline: true },
-      { name: 'Lien Vinted', value: listing.link }
+      { name: 'Prix', value: listing.price, inline: true }
     )
     .setTimestamp(new Date(listing.createdAt));
+  if (listing.link) {
+    embed.addFields({ name: 'Lien', value: listing.link });
+  }
+  return embed;
 }
 
 function searchConfirmEmbed(search, categoryLabel) {
   return new EmbedBuilder()
-    .setColor(0x3498db)
+    .setColor(BRAND_COLOR)
     .setTitle('🔔 Alerte de recherche activée')
     .addFields(
       { name: 'Catégorie', value: categoryLabel, inline: true },
@@ -50,17 +57,22 @@ function searchConfirmEmbed(search, categoryLabel) {
 }
 
 function matchDmEmbed(listing, categoryLabel) {
-  return new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor(BRAND_COLOR)
-    .setTitle('Quelqu\'un vend un article que tu cherches !')
+    .setTitle('🖤 Quelqu\'un vend un article que tu cherches !')
     .addFields(
       { name: 'Catégorie', value: categoryLabel, inline: true },
       { name: 'Article', value: listing.title, inline: true },
-      { name: 'Lien Vinted', value: listing.link },
-      { name: 'Vendeur', value: `${listing.username} (\`${listing.userId}\`)` }
-    )
-    .setFooter({ text: 'Contacte-le via Vinted ou Discord.' })
+      { name: 'Prix', value: listing.price, inline: true }
+    );
+  if (listing.link) {
+    embed.addFields({ name: 'Lien', value: listing.link });
+  }
+  embed
+    .addFields({ name: 'Vendeur', value: `${listing.username} (\`${listing.userId}\`)` })
+    .setFooter({ text: 'Contacte-le directement pour conclure l\'échange.' })
     .setTimestamp();
+  return embed;
 }
 
 function listEmbed(title, items, emptyText) {
