@@ -117,7 +117,8 @@ async function handleModalSubmit(interaction) {
       createdAt: Date.now(),
     };
     store.addSearch(search);
-    return interaction.reply({ embeds: [searchConfirmEmbed(search, getCategoryLabel(category))], ephemeral: true });
+    await interaction.reply({ embeds: [searchConfirmEmbed(search, getCategoryLabel(category))], ephemeral: true });
+    return notifyExistingListings(interaction, search, cat);
   }
 }
 
@@ -135,6 +136,24 @@ async function notifyMatchingSearches(interaction, listing, cat) {
       await user.send({ embeds: [matchDmEmbed(listing, label)] });
     } catch (err) {
       // DMs fermés ou utilisateur introuvable : on ignore silencieusement
+      console.warn(`Impossible de DM ${search.userId}:`, err.message);
+    }
+  }
+}
+
+// Quand une alerte de recherche est créée, on DM aussi l'auteur pour toutes
+// les annonces déjà publiées avant lui dans cette catégorie, sinon il ratait
+// tout ce qui existait avant sa demande.
+async function notifyExistingListings(interaction, search, cat) {
+  const existing = store.getListingsForCategory(search.category);
+  const label = getCategoryLabel(search.category);
+
+  for (const listing of existing) {
+    if (listing.userId === search.userId) continue; // pas de DM pour sa propre annonce
+    try {
+      const user = await interaction.client.users.fetch(search.userId);
+      await user.send({ embeds: [matchDmEmbed(listing, label)] });
+    } catch (err) {
       console.warn(`Impossible de DM ${search.userId}:`, err.message);
     }
   }
