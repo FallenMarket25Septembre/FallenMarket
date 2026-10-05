@@ -98,11 +98,11 @@ function sellModal(category) {
     .setTitle('Vendre un article')
     .addComponents(
       textInput('title', "Titre de l'article", TextInputStyle.Short, {
-        placeholder: 'Ex : Hoodie Nike noir, taille M',
+        placeholder: 'Ex : Testostérone E, 300mg',
         maxLength: 100,
       }),
       textInput('price', 'Prix', TextInputStyle.Short, { placeholder: 'Ex : 20€, ou "à négocier"', maxLength: 30 }),
-      textInput('link', 'Lien Vinted (optionnel)', TextInputStyle.Short, {
+      textInput('link', 'Lien Vinted (optionnel pour le shipping)', TextInputStyle.Short, {
         placeholder: 'https://www.vinted.fr/items/...',
         required: false,
         maxLength: 300,
@@ -116,7 +116,7 @@ function searchModal(category) {
     .setTitle('Rechercher un article')
     .addComponents(
       textInput('query', 'Que cherches-tu ? (mots-clés)', TextInputStyle.Short, {
-        placeholder: 'Ex : hoodie nike noir  —  "*" pour toute la catégorie',
+        placeholder: 'Ex : testostérone E /  "*" pour toute la catégorie',
         maxLength: 150,
       })
     );
