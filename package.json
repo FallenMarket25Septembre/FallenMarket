@@ -1,15 +1,16 @@
 {
-  "name": "market-lucid-bot",
-  "version": "1.0.0",
-  "description": "Bot Discord Market Lucid - annonces & recherches d'articles avec alertes DM",
+  "name": "fallen-market-bot",
+  "version": "2.0.0",
+  "description": "Bot Discord Fallen Market Place - annonces & alertes de recherche avec DM",
   "main": "src/index.js",
   "type": "commonjs",
   "scripts": {
     "start": "node src/index.js",
-    "register": "node src/commands/register.js"
+    "register": "node src/deploy-commands.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
-    "discord.js": "^14.16.3",
+    "discord.js": "^14.19.0",
     "dotenv": "^16.4.5"
   },
   "engines": {

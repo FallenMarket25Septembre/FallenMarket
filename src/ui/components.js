@@ -7,43 +7,59 @@ const {
   TextInputBuilder,
   TextInputStyle,
 } = require('discord.js');
-const { CATEGORIES } = require('../config/categories');
+const { CATEGORIES, getCategoryLabel } = require('../config/categories');
 
-// ---- Panneau principal (les 4 boutons de ta capture + 2 nouveaux) ----
-function panelButtons() {
-  const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('market_sell').setLabel('Vendre un article').setEmoji('🛒').setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId('market_search').setLabel('Rechercher un article').setEmoji('🔍').setStyle(ButtonStyle.Primary)
-  );
-  const row2 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('market_my_listings').setLabel('Mes annonces').setEmoji('🛒').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('market_my_searches').setLabel('Mes recherches').setEmoji('🔍').setStyle(ButtonStyle.Secondary)
-  );
-  const row3 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('market_all_listings').setLabel('Toutes les annonces').setEmoji('📋').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('market_delete').setLabel('Supprimer une annonce').setEmoji('🗑️').setStyle(ButtonStyle.Danger)
-  );
-  return [row1, row2, row3];
+// Tous les customId au même endroit pour éviter les fautes de frappe.
+const IDS = {
+  sell: 'market_sell',
+  search: 'market_search',
+  myListings: 'market_my_listings',
+  mySearches: 'market_my_searches',
+  allListings: 'market_all_listings',
+  deleteListing: 'market_delete',
+  deleteSearch: 'market_delete_search',
+  sellCategory: 'market_sell_category',
+  searchCategory: 'market_search_category',
+  deleteListingSelect: 'market_delete_select',
+  deleteSearchSelect: 'market_delete_search_select',
+  sellModal: 'market_sell_modal', // + ":<catégorie>"
+  searchModal: 'market_search_modal', // + ":<catégorie>"
+};
+
+function button(id, label, emoji, style) {
+  return new ButtonBuilder().setCustomId(id).setLabel(label).setEmoji(emoji).setStyle(style);
 }
 
-// ---- Menu déroulant "Type de produit" (image 3 de ta capture) ----
-function categorySelectRow(customId, placeholder = 'Type de produit') {
+function panelButtons() {
+  return [
+    new ActionRowBuilder().addComponents(
+      button(IDS.sell, 'Vendre un article', '🛒', ButtonStyle.Success),
+      button(IDS.search, 'Rechercher un article', '🔍', ButtonStyle.Primary)
+    ),
+    new ActionRowBuilder().addComponents(
+      button(IDS.myListings, 'Mes annonces', '🛒', ButtonStyle.Secondary),
+      button(IDS.mySearches, 'Mes recherches', '🔍', ButtonStyle.Secondary),
+      button(IDS.allListings, 'Toutes les annonces', '📋', ButtonStyle.Secondary)
+    ),
+    new ActionRowBuilder().addComponents(
+      button(IDS.deleteListing, 'Supprimer une annonce', '🗑️', ButtonStyle.Danger),
+      button(IDS.deleteSearch, 'Supprimer une alerte', '🔕', ButtonStyle.Danger)
+    ),
+  ];
+}
+
+function categorySelectRow(customId) {
   const menu = new StringSelectMenuBuilder()
     .setCustomId(customId)
-    .setPlaceholder(placeholder)
-    .addOptions(
-      CATEGORIES.map((c) => ({ label: c.label, value: c.value, emoji: c.emoji }))
-    );
+    .setPlaceholder('Type de produit')
+    .addOptions(CATEGORIES.slice(0, 25).map((c) => ({ label: c.label, value: c.value, emoji: c.emoji })));
   return new ActionRowBuilder().addComponents(menu);
 }
 
-// ---- Menu déroulant : choisir une annonce à supprimer ----
-// `listings` : les annonces parmi lesquelles choisir (déjà filtrées selon les
-// droits de qui a cliqué : soit ses propres annonces, soit toutes si admin).
-// Discord limite un select menu à 25 options.
+// Discord limite un menu à 25 options.
 function listingSelectRow(listings) {
   const menu = new StringSelectMenuBuilder()
-    .setCustomId('market_delete_select')
+    .setCustomId(IDS.deleteListingSelect)
     .setPlaceholder('Choisis une annonce à supprimer')
     .addOptions(
       listings.slice(0, 25).map((l) => ({
@@ -55,50 +71,63 @@ function listingSelectRow(listings) {
   return new ActionRowBuilder().addComponents(menu);
 }
 
-// ---- Modal : publier une annonce ----
+function searchSelectRow(searches) {
+  const menu = new StringSelectMenuBuilder()
+    .setCustomId(IDS.deleteSearchSelect)
+    .setPlaceholder('Choisis une alerte à supprimer')
+    .addOptions(
+      searches.slice(0, 25).map((s) => ({
+        label: (s.query || 'Toute la catégorie').slice(0, 100),
+        description: getCategoryLabel(s.category).slice(0, 100),
+        value: s.id,
+      }))
+    );
+  return new ActionRowBuilder().addComponents(menu);
+}
+
+function textInput(id, label, style, { placeholder, required = true, maxLength }) {
+  const input = new TextInputBuilder().setCustomId(id).setLabel(label).setStyle(style).setRequired(required);
+  if (placeholder) input.setPlaceholder(placeholder);
+  if (maxLength) input.setMaxLength(maxLength);
+  return new ActionRowBuilder().addComponents(input);
+}
+
 function sellModal(category) {
-  const modal = new ModalBuilder().setCustomId(`market_sell_modal:${category}`).setTitle('Vendre un article');
-  const title = new TextInputBuilder()
-    .setCustomId('title')
-    .setLabel("Titre de l'article")
-    .setStyle(TextInputStyle.Short)
-    .setPlaceholder('Ex: Hoodie noir, taille M')
-    .setRequired(true)
-    .setMaxLength(100);
-  const price = new TextInputBuilder()
-    .setCustomId('price')
-    .setLabel('Prix')
-    .setStyle(TextInputStyle.Short)
-    .setPlaceholder('Ex: 20€, ou "à négocier"')
-    .setRequired(true)
-    .setMaxLength(30);
-  const link = new TextInputBuilder()
-    .setCustomId('link')
-    .setLabel('Lien (optionnel)')
-    .setStyle(TextInputStyle.Short)
-    .setPlaceholder('https://... (laisse vide si pas de lien)')
-    .setRequired(false)
-    .setMaxLength(300);
-  modal.addComponents(
-    new ActionRowBuilder().addComponents(title),
-    new ActionRowBuilder().addComponents(price),
-    new ActionRowBuilder().addComponents(link)
-  );
-  return modal;
+  return new ModalBuilder()
+    .setCustomId(`${IDS.sellModal}:${category}`)
+    .setTitle('Vendre un article')
+    .addComponents(
+      textInput('title', "Titre de l'article", TextInputStyle.Short, {
+        placeholder: 'Ex : Hoodie Nike noir, taille M',
+        maxLength: 100,
+      }),
+      textInput('price', 'Prix', TextInputStyle.Short, { placeholder: 'Ex : 20€, ou "à négocier"', maxLength: 30 }),
+      textInput('link', 'Lien Vinted (optionnel)', TextInputStyle.Short, {
+        placeholder: 'https://www.vinted.fr/items/...',
+        required: false,
+        maxLength: 300,
+      })
+    );
 }
 
-// ---- Modal : créer une alerte de recherche ----
 function searchModal(category) {
-  const modal = new ModalBuilder().setCustomId(`market_search_modal:${category}`).setTitle('Rechercher un article');
-  const query = new TextInputBuilder()
-    .setCustomId('query')
-    .setLabel('Que cherches-tu exactement ?')
-    .setStyle(TextInputStyle.Paragraph)
-    .setPlaceholder('Ex: Hoodie noir, taille M ou L')
-    .setRequired(true)
-    .setMaxLength(300);
-  modal.addComponents(new ActionRowBuilder().addComponents(query));
-  return modal;
+  return new ModalBuilder()
+    .setCustomId(`${IDS.searchModal}:${category}`)
+    .setTitle('Rechercher un article')
+    .addComponents(
+      textInput('query', 'Que cherches-tu ? (mots-clés)', TextInputStyle.Short, {
+        placeholder: 'Ex : hoodie nike noir  —  "*" pour toute la catégorie',
+        maxLength: 150,
+      })
+    );
 }
 
-module.exports = { panelButtons, categorySelectRow, listingSelectRow, sellModal, searchModal };
+module.exports = {
+  IDS,
+  panelButtons,
+  categorySelectRow,
+  listingSelectRow,
+  searchSelectRow,
+  sellModal,
+  searchModal,
+};

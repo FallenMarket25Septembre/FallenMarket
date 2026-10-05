@@ -1,26 +1,29 @@
 // ============================================================
 // CATÉGORIES DU CATALOGUE
 // Modifie cette liste pour ajouter / retirer / renommer des catégories.
-// - value  : identifiant interne (garde-le simple, sans espace, en minuscule)
-// - label  : texte affiché dans le menu déroulant
-// - emoji  : emoji affiché à côté du label
+// - value : identifiant interne stocké en base. Ne le change pas pour une
+//           catégorie qui a déjà des annonces, sinon elles deviennent orphelines.
+// - label : texte affiché dans les menus et les commandes
+// - emoji : emoji affiché à côté du label
+// Discord limite les menus et les choix de slash command à 25 entrées.
 // ============================================================
 
 const CATEGORIES = [
-  { value: 'hauts', label: 'Stimulants', emoji: '🧩' },
-  { value: 'bas', label: 'Auxillaires', emoji: '💊' },
-  { value: 'vestes', label: 'Peptides', emoji: '🧬' },
-  { value: 'chaussures', label: 'Stéroides', emoji: '💉' },
+  { value: 'hauts', label: 'Hauts', emoji: '👕' },
+  { value: 'bas', label: 'Bas', emoji: '👖' },
+  { value: 'vestes', label: 'Vestes & manteaux', emoji: '🧥' },
+  { value: 'chaussures', label: 'Chaussures', emoji: '👟' },
+  { value: 'accessoires', label: 'Accessoires', emoji: '🧢' },
   { value: 'autre', label: 'Autre', emoji: '📦' },
 ];
 
-function getCategoryByValue(value) {
+function getCategory(value) {
   return CATEGORIES.find((c) => c.value === value);
 }
 
 function getCategoryLabel(value) {
-  const cat = getCategoryByValue(value);
+  const cat = getCategory(value);
   return cat ? `${cat.emoji} ${cat.label}` : value;
 }
 
-module.exports = { CATEGORIES, getCategoryByValue, getCategoryLabel };
+module.exports = { CATEGORIES, getCategory, getCategoryLabel };
