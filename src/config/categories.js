@@ -9,12 +9,12 @@
 // ============================================================
 
 const CATEGORIES = [
-  { value: 'Stéroïdes injectables', label: 'Haut', emoji: '💉' },
-  { value: 'Peptides', label: 'Bas', emoji: '🧬' },
-  { value: 'Stimulants', label: 'Vestes & manteaux', emoji: '💊' },
-  { value: 'Nootropics', label: 'Chaussures', emoji: '🚬' },
-  { value: 'Stéroïded oraux', label: 'Accessoires', emoji: '⚗️' },
-  { value: 'Autres', label: 'Autre', emoji: '📦' },
+  { value: 'Stéroïdes injectables', label: 'Stéroïdes injectables', emoji: '💉' },
+  { value: 'Peptides', label: 'Peptides', emoji: '🧬' },
+  { value: 'Stimulants', label: 'Stimulants', emoji: '💊' },
+  { value: 'Nootropics', label: 'Nootropics', emoji: '🚬' },
+  { value: 'Stéroïded oraux', label: 'Stéroïded oraux', emoji: '⚗️' },
+  { value: 'Autres', label: 'Autres', emoji: '📦' },
 ];
 
 function getCategory(value) {
